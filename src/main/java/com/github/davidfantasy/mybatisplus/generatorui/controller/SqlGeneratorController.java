@@ -31,5 +31,14 @@ public class SqlGeneratorController {
         return ResultGenerator.genSuccessResult();
     }
 
+    @GetMapping("/changeConfig")
+    public void changeConfig(String url,String username,String password){
+        generatorConfig.setJdbcUrl(url);
+        generatorConfig.setUserName(username);
+        generatorConfig.setPassword(password);
+
+        //generatorConfig.setDateType();
+    }
+
 
 }

@@ -20,6 +20,7 @@ public class MbpGeneratorController {
     @PostMapping("/gen-code")
     public Result genCode(@RequestBody MpgGenCodeDto dto) {
         mbpGeneratorService.genCodeBatch(dto.getGenSetting(), dto.getTables());
+
         return ResultGenerator.genSuccessResult();
     }
 

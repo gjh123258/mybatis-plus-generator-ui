@@ -41,7 +41,7 @@ public class MybatisPlusToolsApplication {
      * @param args
      */
     public static void main(String[] args) {
-        GeneratorConfig config = GeneratorConfig.builder().jdbcUrl("jdbc:mysql://10.192.33.171:3306/lab_center")
+        GeneratorConfig config = GeneratorConfig.builder().jdbcUrl("jdbc:mysql://10.192.33.171:3306/codegen")
                 .userName("root")
                 .password("mysql171171")
                 .driverClassName("com.mysql.cj.jdbc.Driver")

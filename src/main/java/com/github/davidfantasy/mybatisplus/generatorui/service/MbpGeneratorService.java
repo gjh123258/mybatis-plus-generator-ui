@@ -1,6 +1,7 @@
 package com.github.davidfantasy.mybatisplus.generatorui.service;
 
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.generator.AutoGenerator;
 import com.baomidou.mybatisplus.generator.config.*;
 import com.baomidou.mybatisplus.generator.config.po.TableField;
@@ -20,12 +21,14 @@ import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @Slf4j
@@ -47,6 +50,9 @@ public class MbpGeneratorService {
 
     @Autowired
     private BeetlTemplateEngine beetlTemplateEngine;
+
+    @Value("${basepackage.path}")
+    private String packagePath;
 
     @PostConstruct
     public void initGenerator() {
@@ -70,7 +76,8 @@ public class MbpGeneratorService {
 
     public void genCodeBatch(GenSetting genSetting, List<String> tables) {
         checkGenSetting(genSetting);
-        //projectPathResolver.refreshBaseProjectPath(genSetting.getRootPath());
+        String basePackage = this.packagePath;
+        projectPathResolver.refreshBaseProjectPath(genSetting.getRootPath());
         //自定义参数配置
         mpg.setCfg(new TableInjectionConfig(generatorConfig, genSetting));
         //生成策略配置
@@ -91,19 +98,13 @@ public class MbpGeneratorService {
                 return nameConverter.propertyNameConvert(field.getName());
             }
         });
-
+        mpg.setStrategy(strategy);
         //设置java代码的包名
         PackageConfig pc = new PackageConfig();
         pc.setParent(null);
-        /*pc.setController(PathUtil.joinPackage(userConfig.getControllerInfo().getOutputPackage(), genSetting.getModuleName()));
-        pc.setEntity(PathUtil.joinPackage(userConfig.getEntityInfo().getOutputPackage(), genSetting.getModuleName()));
-        pc.setMapper(PathUtil.joinPackage(userConfig.getMapperInfo().getOutputPackage(), genSetting.getModuleName()));
-        pc.setService(PathUtil.joinPackage(userConfig.getServiceInfo().getOutputPackage(), genSetting.getModuleName()));
-        pc.setServiceImpl(PathUtil.joinPackage(userConfig.getServiceImplInfo().getOutputPackage(), genSetting.getModuleName()));
-        mpg.setPackageInfo(pc);*/
 
         for (String table : tables) {
-            projectPathResolver.setBasePackage(projectPathResolver.getBasePackage()+"."+table);
+            projectPathResolver.setBasePackage(basePackage+"."+table.toLowerCase().replace(StrUtil.UNDERLINE,StrUtil.EMPTY));
             projectPathResolver.refreshBaseProjectPath(genSetting.getRootPath());
             userConfigStore.setOutputFiles(userConfig);
 
@@ -149,38 +150,6 @@ public class MbpGeneratorService {
         //清除config，强制重新创建，否则会导致数据表不刷新
         ag.setConfig(null);
         ag.execute();
-    }
-
-    private void setPackage(GenSetting genSetting,String tableName){
-        projectPathResolver.setBasePackage(projectPathResolver.getBasePackage()+tableName);
-
-        UserConfig userConfig = userConfigStore.getDefaultUserConfig();
-        BeanUtils.copyProperties(userConfig.getEntityStrategy(), mpg.getGlobalConfig());
-        mpg.getGlobalConfig().setAuthor(genSetting.getAuthor());
-        mpg.getGlobalConfig().setFileOverride(genSetting.isOverride());
-        StrategyConfig strategy = getCurrentStrategy(userConfig);
-        mpg.setStrategy(strategy);
-        NameConverter nameConverter = generatorConfig.getAvailableNameConverter();
-        strategy.setNameConvert(new INameConvert() {
-            @Override
-            public String entityNameConvert(TableInfo tableInfo) {
-                return nameConverter.entityNameConvert(tableInfo.getName());
-            }
-
-            @Override
-            public String propertyNameConvert(TableField field) {
-                return nameConverter.propertyNameConvert(field.getName());
-            }
-        });
-        //设置java代码的包名
-        PackageConfig pc = new PackageConfig();
-        pc.setParent(null);
-        pc.setController(PathUtil.joinPackage(userConfig.getControllerInfo().getOutputPackage(), genSetting.getModuleName()));
-        pc.setEntity(PathUtil.joinPackage(userConfig.getEntityInfo().getOutputPackage(), genSetting.getModuleName()));
-        pc.setMapper(PathUtil.joinPackage(userConfig.getMapperInfo().getOutputPackage(), genSetting.getModuleName()));
-        pc.setService(PathUtil.joinPackage(userConfig.getServiceInfo().getOutputPackage(), genSetting.getModuleName()));
-        pc.setServiceImpl(PathUtil.joinPackage(userConfig.getServiceImplInfo().getOutputPackage(), genSetting.getModuleName()));
-        mpg.setPackageInfo(pc);
     }
 
     private StrategyConfig getCurrentStrategy(UserConfig userConfig) {

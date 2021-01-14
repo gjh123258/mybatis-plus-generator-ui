@@ -22,8 +22,7 @@ public interface NameConverter {
         if (Strings.isNullOrEmpty(tableName)) {
             return "";
         }
-        //tableName = tableName.replace(StrUtil.UNDERLINE,"");
-        tableName = tableName.substring(tableName.indexOf(StrUtil.UNDERLINE) + 1, tableName.length());
+        //tableName = tableName.substring(tableName.indexOf(StrUtil.UNDERLINE) + 1, tableName.length());
         return StrUtil.upperFirst(StrUtil.toCamelCase(tableName.toLowerCase()));
     }
 

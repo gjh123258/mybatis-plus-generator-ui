@@ -1,6 +1,11 @@
+import cn.hutool.core.util.StrUtil;
 import com.github.davidfantasy.mybatisplus.generatorui.GeneratorConfig;
 import com.github.davidfantasy.mybatisplus.generatorui.MybatisPlusToolsApplication;
 import com.github.davidfantasy.mybatisplus.generatorui.mbp.NameConverter;
+import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.util.Locale;
 
 public class TestApplication {
 
@@ -25,6 +30,13 @@ public class TestApplication {
                 })
                 .build();
         MybatisPlusToolsApplication.run(config);
+    }
+
+    @Test
+    public void getTableName(){
+        String name = "gen_FORM_conf";
+        name = name.replace(StrUtil.UNDERLINE,StrUtil.EMPTY).toLowerCase();
+        System.out.println(name);
     }
 
 
